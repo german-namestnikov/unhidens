@@ -85,6 +85,9 @@ for ns in ns_list:
         ns_dict[ns] = {'ip': ns_ip, 'servers': real_names_list, 'versions': real_versions_list}
 
     except Exception as e:
+        if args.verbose:
+            comment = "; " + str(e)
+            print(comment)
         break
  
 if args.verbose:
