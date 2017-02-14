@@ -65,8 +65,9 @@ for ns in ns_list:
     verbose("; Work started for NS '%s'" % (ns))
     real_names_list = []
     real_versions_list = []
-    try:
-        for i in range(REQUESTS_PER_NS):
+    
+    for i in range(REQUESTS_PER_NS):
+        try:
             real_name = get_real_name(ns)
             real_ip = get_ip(real_name, args.domain)
             
@@ -77,18 +78,19 @@ for ns in ns_list:
             ns_record = {'name': real_name, 'ip': real_ip}
             if ns_record not in real_names_list:
                 real_names_list.append(ns_record)
-        
-        ns_ip = get_ip(ns)
-        verbose("; Found next servers for given NS '%s' (%s): %s" % (ns, ns_ip, str(real_names_list)))
-        verbose("; Associated versions: %s" % (str(real_versions_list)))
-        verbose("")
-        ns_dict[ns] = {'ip': ns_ip, 'servers': real_names_list, 'versions': real_versions_list}
+ 
+        except Exception as e:
+            if args.verbose:
+                comment = "; " + str(e)
+                print(comment)
+            break
+       
+    ns_ip = get_ip(ns)
+    verbose("; Found next servers for given NS '%s' (%s): %s" % (ns, ns_ip, str(real_names_list)))
+    verbose("; Associated versions: %s" % (str(real_versions_list)))
+    verbose("")
+    ns_dict[ns] = {'ip': ns_ip, 'servers': real_names_list, 'versions': real_versions_list}
 
-    except Exception as e:
-        if args.verbose:
-            comment = "; " + str(e)
-            print(comment)
-        break
  
 if args.verbose:
     comment = "; Final results in JSON:"
