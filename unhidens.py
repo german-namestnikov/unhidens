@@ -88,7 +88,7 @@ for ns in ns_list:
         break
  
 if args.verbose:
-    comment = "; Final results in JSON: " + str(ns_list)
+    comment = "; Final results in JSON:"
     print(comment)   
 
 print(json.dumps(ns_dict, indent=4, sort_keys=True))
