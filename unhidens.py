@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 import subprocess
 import json
@@ -46,21 +46,27 @@ def verbose(comment):
     if args.verbose:
         print(comment)
 
-parser = argparse.ArgumentParser(description="Small utility exploiting DNS Chaosnet TXT requests to obtain information about servers placed behind load balancers, firewalls and other.")
-parser.add_argument("--domain", help="Select domain for NS enumeration.")
+parser = argparse.ArgumentParser(description="Small DNS Recon utility, allows you to obtain some useful info about NS-servers placed behind relays, firewalls, etc.")
+parser.add_argument("--domain", help="Investigate all NS for a given domain.")
+parser.add_argument("--server", help="Investigate only this NS.")
 parser.add_argument("--verbose", help = "Show additional info about script flow.", action="store_true")
 
 args = parser.parse_args()
-if not args.domain:
+if not args.domain and not args.server:
     parser.print_help()
     exit()
 
-ns_list = get_ns(args.domain)
-verbose("; Found next NS for domain '%s': %s" % (args.domain, str(ns_list)))
-verbose("")
+if args.domain:
+    ns_list = get_ns(args.domain)
+    verbose("; Found next NS for domain '%s': %s" % (args.domain, str(ns_list)))
+    verbose("")
+else:
+    if args.server:
+        ns_list = [args.server]
+
 
 ns_dict = dict()
-
+    
 for ns in ns_list:
     verbose("; Work started for NS '%s'" % (ns))
     real_names_list = []
@@ -72,11 +78,11 @@ for ns in ns_list:
             real_ip = get_ip(real_name, args.domain)
             
             real_version = get_version(ns)            
-            if real_version not in real_versions_list:
+            if real_version and real_version not in real_versions_list:
                 real_versions_list.append(real_version)
             
             ns_record = {'name': real_name, 'ip': real_ip}
-            if ns_record not in real_names_list:
+            if real_name and ns_record not in real_names_list:
                 real_names_list.append(ns_record)
  
         except Exception as e:
